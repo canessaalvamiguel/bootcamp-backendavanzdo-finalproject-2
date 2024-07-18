@@ -1,10 +1,10 @@
-package dev.canessaalvamiguel.serviceuser.configuration;
+package dev.canessaalvamiguel.servicecompany.configuration;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import dev.canessaalvamiguel.serviceuser.exceptions.*;
+import dev.canessaalvamiguel.servicecompany.exceptions.*;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -16,7 +16,7 @@ public class ApiExceptionHandler {
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ExceptionHandler(EmailExistsException.class)
+  @ExceptionHandler(RucExistsException.class)
   public ExceptionResponse emailExists(Exception exception) {
     return new ExceptionResponse(exception.getMessage(), HttpStatus.BAD_REQUEST.value());
   }

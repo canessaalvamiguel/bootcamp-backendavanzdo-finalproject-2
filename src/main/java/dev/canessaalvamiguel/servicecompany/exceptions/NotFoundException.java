@@ -1,4 +1,4 @@
-package dev.canessaalvamiguel.serviceuser.exceptions;
+package dev.canessaalvamiguel.servicecompany.exceptions;
 
 public class NotFoundException extends RuntimeException {
 

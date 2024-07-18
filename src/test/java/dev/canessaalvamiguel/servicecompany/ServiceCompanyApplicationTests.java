@@ -1,10 +1,10 @@
-package dev.canessaalvamiguel.serviceuser;
+package dev.canessaalvamiguel.servicecompany;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ServiceUserApplicationTests {
+class ServiceCompanyApplicationTests {
 
   @Test
   void contextLoads() {

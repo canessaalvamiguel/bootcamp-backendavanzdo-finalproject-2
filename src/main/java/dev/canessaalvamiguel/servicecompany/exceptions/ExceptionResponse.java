@@ -1,4 +1,4 @@
-package dev.canessaalvamiguel.serviceuser.exceptions;
+package dev.canessaalvamiguel.servicecompany.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
