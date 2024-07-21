@@ -1,5 +1,6 @@
 package dev.canessaalvamiguel.servicecompany.rest;
 
+import dev.canessaalvamiguel.servicecompany.configuration.FeignConfig;
 import dev.canessaalvamiguel.servicecompany.entities.Product;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.List;
 
 
-@FeignClient(name = "product-service", url = "http://localhost:8081")
+@FeignClient(name = "product-service", url = "http://localhost:8081", configuration = FeignConfig.class)
 public interface ProductRestClient {
 
   @PostMapping("/api/v1/auth/token")

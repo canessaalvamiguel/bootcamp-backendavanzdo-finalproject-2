@@ -16,7 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class CompanyController {
 
-  CompanyService companyService;
+  private final CompanyService companyService;
+
   //TODO: Implement pagination
   @GetMapping
   public ResponseEntity<List<Company>> getCompanies(){
