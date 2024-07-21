@@ -1,0 +1,60 @@
+version: '3.9'
+
+services:
+  service-company:
+    container_name: service-company
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/service-company
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    depends_on:
+      - postgres
+    networks:
+      - my_product_service_network
+  postgres:
+    container_name: postgres_company
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: service-company
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    restart: no
+    networks:
+      - my_product_service_network
+  pgadmin:
+    container_name: pgadmin_company
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: no
+    depends_on:
+      - postgres
+    networks:
+      - my_product_service_network
+
+volumes:
+  postgres:
+  pgadmin:
+
+networks:
+  my_product_service_network:
+    external: true
