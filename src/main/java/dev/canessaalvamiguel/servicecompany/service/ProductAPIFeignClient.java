@@ -6,9 +6,7 @@ import dev.canessaalvamiguel.servicecompany.rest.ProductRestClient;
 import io.github.resilience4j.retry.Retry;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Base64;
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.function.Supplier;
 
 @Service
 @Slf4j
-public class ProductAPIFeignClient implements IProductAPI{
+public class ProductAPIFeignClient implements IProductAPI {
 
   private final ProductRestClient productRestClient;
   private String token = "";
@@ -28,7 +26,8 @@ public class ProductAPIFeignClient implements IProductAPI{
   public ProductAPIFeignClient(
       ProductRestClient productRestClient,
       ApiProperties apiProperties,
-      Retry retry) {
+      Retry retry
+  ) {
     this.productRestClient = productRestClient;
     this.apiProperties = apiProperties;
     this.retry = retry;
@@ -40,18 +39,20 @@ public class ProductAPIFeignClient implements IProductAPI{
 
   @Override
   public void authenticate() {
+    log.info("Authenticating");
     String basicAuth = "Basic " + Base64.getEncoder().encodeToString(apiProperties.getCredentials());
     this.token = productRestClient.authenticate(basicAuth);
+    this.tokenExpiryTime = System.currentTimeMillis() + (TOKEN_VALID_MINUTES * 60 * 1000);
   }
 
   @Override
   public List<Product> getProductByCompanyId(Long companyId) {
-    if (isTokenExpired()) {
+    log.info("Calling Product API");
+    if (token.isEmpty() || isTokenExpired()) {
       authenticate();
     }
 
-    Supplier<List<Product>> supplier =
-        () -> productRestClient.getProductByCompanyId(companyId, "Bearer " + token);
+    Supplier<List<Product>> supplier = () -> productRestClient.getProductByCompanyId(companyId, "Bearer " + token);
 
     return Try.ofSupplier(Retry.decorateSupplier(retry, supplier))
         .recover(throwable -> handleRetryFallback(companyId, throwable))
@@ -59,15 +60,7 @@ public class ProductAPIFeignClient implements IProductAPI{
   }
 
   private List<Product> handleRetryFallback(Long companyId, Throwable throwable) {
-    if (throwable instanceof ResponseStatusException) {
-      ResponseStatusException ex = (ResponseStatusException) throwable;
-      if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-        log.info("UNAUTHORIZED error detected. Trying to authenticate again. " + ex.getMessage());
-        authenticate();
-        return productRestClient.getProductByCompanyId(companyId, "Bearer " + token);
-      }
-    }
-    log.error("Failed to get product by company ID after retries: " + throwable.getMessage());
+    log.info("handleRetryFallback method called");
     throw new RuntimeException("Unable to fetch product details after retries", throwable);
   }
 }
