@@ -1,6 +1,7 @@
 package dev.canessaalvamiguel.servicecompany.controller;
 
 import dev.canessaalvamiguel.servicecompany.entities.Company;
+import dev.canessaalvamiguel.servicecompany.entities.Product;
 import dev.canessaalvamiguel.servicecompany.service.CompanyService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,12 @@ public class CompanyController {
   public ResponseEntity<Company> createCompany(@RequestBody Company company){
     log.info("Creating new company: {}", company);
     return ResponseEntity.ok(companyService.createCompany(company));
+  }
+
+  @GetMapping("/{companyId}/products")
+  public ResponseEntity<List<Product>> getProductsByCompany(@PathVariable Long companyId){
+    log.info("Getting company by id: {}", companyId);
+    return ResponseEntity.ok(companyService.getProductsByCompany(companyId));
   }
 
 }
