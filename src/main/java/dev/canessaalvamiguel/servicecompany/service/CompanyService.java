@@ -7,9 +7,9 @@ import dev.canessaalvamiguel.servicecompany.exceptions.RucExistsException;
 import dev.canessaalvamiguel.servicecompany.repository.CompanyRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -18,8 +18,9 @@ public class CompanyService {
   private final CompanyRepository companyRepository;
   private final IProductAPI productRestClient;
 
-  public List<Company> getCompanies(){
-    return companyRepository.findAll();
+  public Page<Company> getCompanies(int page, int size){
+    Pageable pageable = PageRequest.of(page, size);
+    return companyRepository.findAll(pageable);
   }
 
   public Company getCompanyById(Long companyId){
