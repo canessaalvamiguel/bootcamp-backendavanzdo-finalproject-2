@@ -6,6 +6,7 @@ import dev.canessaalvamiguel.servicecompany.rest.ProductRestClient;
 import io.github.resilience4j.retry.Retry;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -58,20 +59,26 @@ public class ProductAPIFeignClient implements IProductAPI {
   }
 
   @Override
-  public List<Product> getProductByCompanyId(Long companyId) {
+  public Page<Product> getProductByCompanyId(Long companyId, int page, int size) {
     log.info("Calling Product API");
     if (token.isEmpty() || isTokenExpired()) {
       authenticate();
     }
 
-    Supplier<List<Product>> supplier = () -> productRestClient.getProductByCompanyId(companyId, "Bearer " + token);
+    Supplier<Page<Product>> supplier =
+        () -> productRestClient.getProductByCompanyId(
+            companyId,
+            page,
+            size,
+            "Bearer " + token
+        );
 
     return Try.ofSupplier(Retry.decorateSupplier(productClientRetry, supplier))
         .recover(throwable -> handleRetryFallback(companyId, throwable))
         .get();
   }
 
-  private List<Product> handleRetryFallback(Long companyId, Throwable throwable) {
+  private Page<Product> handleRetryFallback(Long companyId, Throwable throwable) {
     log.error("handleRetryFallback method called, companyId: {}", companyId);
     throw new RuntimeException("Unable to fetch product details after retries", throwable);
   }

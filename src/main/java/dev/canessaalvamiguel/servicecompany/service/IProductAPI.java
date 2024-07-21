@@ -2,10 +2,9 @@ package dev.canessaalvamiguel.servicecompany.service;
 
 
 import dev.canessaalvamiguel.servicecompany.entities.Product;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IProductAPI {
   void authenticate();
-  List<Product> getProductByCompanyId( Long companyId);
+  Page<Product> getProductByCompanyId(Long companyId, int page, int size);
 }

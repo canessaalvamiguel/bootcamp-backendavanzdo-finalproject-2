@@ -5,6 +5,7 @@ import dev.canessaalvamiguel.servicecompany.entities.Product;
 import dev.canessaalvamiguel.servicecompany.service.CompanyService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +39,13 @@ public class CompanyController {
   }
 
   @GetMapping("/{companyId}/products")
-  public ResponseEntity<List<Product>> getProductsByCompany(@PathVariable Long companyId){
-    log.info("Getting company by id: {}", companyId);
-    return ResponseEntity.ok(companyService.getProductsByCompany(companyId));
+  public ResponseEntity<Page<Product>> getProductsByCompany(
+      @PathVariable Long companyId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ){
+    log.info("Getting company by id: {} with page {} and size {}", companyId, page, size);
+    return ResponseEntity.ok(companyService.getProductsByCompany(companyId, page, size));
   }
 
 }

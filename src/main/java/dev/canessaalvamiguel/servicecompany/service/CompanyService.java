@@ -6,6 +6,7 @@ import dev.canessaalvamiguel.servicecompany.exceptions.NotFoundException;
 import dev.canessaalvamiguel.servicecompany.exceptions.RucExistsException;
 import dev.canessaalvamiguel.servicecompany.repository.CompanyRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class CompanyService {
     return companyRepository.save(company);
   }
 
-  public List<Product> getProductsByCompany(Long companyId){
-    return productRestClient.getProductByCompanyId(companyId);
+  public Page<Product> getProductsByCompany(Long companyId, int page, int size){
+    return productRestClient.getProductByCompanyId(companyId, page, size);
   }
 }
