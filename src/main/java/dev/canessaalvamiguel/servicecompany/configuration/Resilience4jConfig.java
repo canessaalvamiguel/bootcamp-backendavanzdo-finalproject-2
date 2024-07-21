@@ -22,7 +22,7 @@ public class Resilience4jConfig {
   }
 
   @Bean
-  public Retry retry(RetryRegistry retryRegistry) {
+  public Retry productClientRetry(RetryRegistry retryRegistry) {
     RetryConfig config = RetryConfig.custom()
         .maxAttempts(3)
         .waitDuration(Duration.ofMillis(500))
@@ -34,6 +34,18 @@ public class Resilience4jConfig {
         })
         .build();
     Retry retry = retryRegistry.retry("ProductAPIFeignClient", config);
+    retry.getEventPublisher().onRetry(this::logRetry);
+    return retry;
+  }
+
+  @Bean
+  public Retry authenticateRetry(RetryRegistry retryRegistry) {
+    RetryConfig config = RetryConfig.custom()
+        .maxAttempts(3)
+        .waitDuration(Duration.ofMillis(500))
+        .retryOnException(throwable -> throwable instanceof RuntimeException)
+        .build();
+    Retry retry = retryRegistry.retry("authenticate", config);
     retry.getEventPublisher().onRetry(this::logRetry);
     return retry;
   }

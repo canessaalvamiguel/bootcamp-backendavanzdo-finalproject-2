@@ -19,18 +19,21 @@ public class ProductAPIFeignClient implements IProductAPI {
   private final ProductRestClient productRestClient;
   private String token = "";
   private final ApiProperties apiProperties;
-  private final Retry retry;
+  private final Retry productClientRetry;
+  private final Retry authenticateRetry;
   private long tokenExpiryTime = 0;
   private final int TOKEN_VALID_MINUTES = 60;
 
   public ProductAPIFeignClient(
       ProductRestClient productRestClient,
       ApiProperties apiProperties,
-      Retry retry
+      Retry productClientRetry,
+      Retry authenticateRetry
   ) {
     this.productRestClient = productRestClient;
     this.apiProperties = apiProperties;
-    this.retry = retry;
+    this.productClientRetry = productClientRetry;
+    this.authenticateRetry = authenticateRetry;
   }
 
   private boolean isTokenExpired() {
@@ -41,8 +44,17 @@ public class ProductAPIFeignClient implements IProductAPI {
   public void authenticate() {
     log.info("Authenticating");
     String basicAuth = "Basic " + Base64.getEncoder().encodeToString(apiProperties.getCredentials());
-    this.token = productRestClient.authenticate(basicAuth);
+    Supplier<String> supplier = () -> productRestClient.authenticate(basicAuth);
+
+    this.token = Try.ofSupplier(Retry.decorateSupplier(authenticateRetry, supplier))
+        .recover(this::handleRetryFallbackForAuthenticate)
+        .get();
     this.tokenExpiryTime = System.currentTimeMillis() + (TOKEN_VALID_MINUTES * 60 * 1000);
+  }
+
+  private String handleRetryFallbackForAuthenticate(Throwable throwable) {
+    log.error("handleRetryFallbackForAuthenticate method called");
+    throw new RuntimeException("Unable to authenticate after retries", throwable);
   }
 
   @Override
@@ -54,13 +66,13 @@ public class ProductAPIFeignClient implements IProductAPI {
 
     Supplier<List<Product>> supplier = () -> productRestClient.getProductByCompanyId(companyId, "Bearer " + token);
 
-    return Try.ofSupplier(Retry.decorateSupplier(retry, supplier))
+    return Try.ofSupplier(Retry.decorateSupplier(productClientRetry, supplier))
         .recover(throwable -> handleRetryFallback(companyId, throwable))
         .get();
   }
 
   private List<Product> handleRetryFallback(Long companyId, Throwable throwable) {
-    log.info("handleRetryFallback method called");
+    log.error("handleRetryFallback method called, companyId: {}", companyId);
     throw new RuntimeException("Unable to fetch product details after retries", throwable);
   }
 }
