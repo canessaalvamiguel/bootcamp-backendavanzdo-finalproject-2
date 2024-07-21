@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 
-@FeignClient(name = "product-service", url = "http://localhost:8081", configuration = FeignConfig.class)
+@FeignClient(name = "product-service", url = "${product-service.url}", configuration = FeignConfig.class)
 public interface ProductRestClient {
 
   @PostMapping("/api/v1/auth/token")
