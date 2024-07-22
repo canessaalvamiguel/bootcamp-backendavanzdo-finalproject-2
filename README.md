@@ -93,3 +93,50 @@ The Company Service manages company, employee, and area data. The main entities 
     ```
 
 This will set up the network, create the necessary volumes, build the Docker image, and start the container running the application.
+
+## Endpoints
+
+### Get Companies
+
+Retrieve a list of companies with pagination support.
+
+- **Endpoint:** `{{base_url_company_service}}/api/v1/companies?page=0&size=5`
+- **Example URL:** `http://35.223.99.149:8080/api/v1/companies?page=0&size=5`
+
+**Curl Command:**
+```sh
+curl -X GET "{{base_url_company_service}}/api/v1/companies?page=0&size=5" -H "accept: application/json"
+```
+
+### Get Employees
+Retrieve a list of employees for a specific company with pagination support.
+
+- **Endpoint:** `{{base_url_company_service}}/api/v1/companies/1/employees?page=0&size=5`
+- **Example URL**: `http://35.223.99.149:8080/api/v1/companies/1/employees?page=0&size=5`
+
+**Curl Command:**
+```sh
+curl -X GET "{{base_url_company_service}}/api/v1/companies/1/employees?page=0&size=5" -H "accept: application/json"
+```
+
+### Get Products (External Service Communication)
+Retrieve a list of products owned by a company. This endpoint communicates with an external product service.
+
+- **Endpoint:** `{{base_url_company_service}}/api/v1/companies/1/products?page=0&size=5`
+- **Example URL**: `http://35.223.99.149:8080/api/v1/companies/1/products?page=0&size=5`
+
+**Curl Command:**
+```sh
+curl -X GET "{{base_url_company_service}}/api/v1/companies/1/products?page=0&size=5" -H "accept: application/json"
+```
+
+### Get One Company
+Retrieve details of a single company by its ID.
+
+- **Endpoint:** `{{base_url_company_service}}/api/v1/companies/1`
+- **Example URL:** `http://35.223.99.149:8080/api/v1/companies/1`
+
+**Curl Command:**
+```sh
+curl -X GET "{{base_url_company_service}}/api/v1/companies/1" -H "accept: application/json"
+```
